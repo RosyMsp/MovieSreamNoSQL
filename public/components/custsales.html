@@ -1,0 +1,78 @@
+<section class="section">
+  <div class="section-header">
+    <div>
+      <h2>Ventas</h2>
+      <p>En esta colección se referencian clientes y películas, además de embeber activityContext.</p>
+    </div>
+
+    <button type="button" onclick="openSaleModal()">
+      Nueva venta
+    </button>
+  </div>
+
+  <div class="filters">
+    <input type="text" id="filterCustomerName" placeholder="Buscar por cliente" />
+    <input type="text" id="filterMovieTitle" placeholder="Buscar por película" />
+    <input type="text" id="filterPaymentMethod" placeholder="Método de pago" />
+    <button type="button" onclick="loadSales()">Buscar</button>
+    <button type="button" class="secondary-button" onclick="clearSaleFilters()">Limpiar</button>
+  </div>
+
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>ID venta</th>
+          <th>Cliente</th>
+          <th>Película</th>
+          <th>Fecha</th>
+          <th>App</th>
+          <th>Dispositivo</th>
+          <th>Pago</th>
+          <th>Precio final</th>
+          <th>Actividad</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="salesTableBody"></tbody>
+    </table>
+  </div>
+</section>
+
+<div id="saleModal" class="modal-overlay hidden">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="saleModalTitle">Nueva venta</h2>
+      <button type="button" class="close-button" onclick="closeSaleModal()">×</button>
+    </div>
+
+    <form id="saleForm" class="form modal-form">
+      <input type="hidden" id="saleId" />
+
+      <input type="date" id="dayId" required />
+
+      <select id="saleCustomerSelect" required>
+        <option value="">Selecciona un cliente</option>
+      </select>
+
+      <select id="saleMovieSelect" required onchange="handleMoviePriceChange()">
+        <option value="">Selecciona una película</option>
+      </select>
+
+      <input type="text" id="saleApp" placeholder="App" required />
+      <input type="text" id="saleDevice" placeholder="Dispositivo" required />
+      <input type="text" id="saleOs" placeholder="Sistema operativo" required />
+      <input type="text" id="paymentMethod" placeholder="Método de pago" required />
+      <input type="number" id="saleListPrice" placeholder="Precio lista" required />
+      <input type="text" id="discountType" placeholder="Tipo de descuento" required />
+      <input type="number" id="discountPercent" placeholder="Porcentaje descuento" required oninput="calculateActualPrice()" />
+      <input type="number" id="actualPrice" placeholder="Precio final" required />
+      <input type="datetime-local" id="activityTime" required />
+
+      <div class="form-actions">
+        <button type="submit">Guardar venta</button>
+        <button type="button" class="secondary-button" onclick="closeSaleModal()">Cancelar</button>
+      </div>
+    </form>
+  </div>
+</div>

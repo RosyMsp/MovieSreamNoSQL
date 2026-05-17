@@ -9,7 +9,6 @@ async function connectDB() {
     if(!db){
         await client.connect();
         db = client.db("moviestream");
-        console.log("Conectado a MongoDB")
     }
     return db;
 }

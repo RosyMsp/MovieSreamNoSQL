@@ -27,11 +27,28 @@ router.get("/", async(req, res) => {
     }
 });
 
+async function getNextMovieId(db) {
+  const lastMovie = await db.collection("movies")
+    .find({ _id: { $type: "number" } })
+    .sort({ _id: -1 })
+    .limit(1)
+    .toArray();
+
+  if (lastMovie.length === 0) {
+    return 1;
+  }
+
+  return lastMovie[0]._id + 1;
+}
+
 router.post("/", async(req, res) => {
     try{
         const db = await connectDB();
 
+        const nextMovieId = await getNextMovieId(db);
+
         const movie = {
+            _id: nextMovieId,
             title: req.body.title,
             year: Number(req.body.year),
             genre: {

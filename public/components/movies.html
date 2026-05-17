@@ -1,0 +1,73 @@
+<section class="section">
+  <div class="section-header">
+    <div>
+      <h2>Películas</h2>
+      <p>En esta colección se muestra el género embebido dentro del documento de la película.</p>
+    </div>
+
+    <button type="button" onclick="openMovieModal()">
+      Nueva película
+    </button>
+  </div>
+
+  <div class="filters">
+    <input type="text" id="searchMovie" placeholder="Buscar por título" />
+    <input type="text" id="searchGenre" placeholder="Filtrar por género" />
+    <button type="button" onclick="loadMovies()">Buscar</button>
+    <button type="button" class="secondary-button" onclick="clearMovieFilters()">Limpiar</button>
+  </div>
+
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Título</th>
+          <th>Año</th>
+          <th>Género</th>
+          <th>Actores</th>
+          <th>Duración</th>
+          <th>Precio</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="moviesTableBody"></tbody>
+    </table>
+  </div>
+</section>
+
+<div id="movieModal" class="modal-overlay hidden">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="movieModalTitle">Nueva película</h2>
+      <button type="button" class="close-button" onclick="closeMovieModal()">×</button>
+    </div>
+
+    <form id="movieForm" class="form modal-form">
+      <input type="hidden" id="movieId" />
+
+      <input type="text" id="title" placeholder="Título" required />
+      <input type="number" id="year" placeholder="Año" required />
+
+      <select id="genreSelect" required onchange="handleGenreChange()">
+        <option value="">Selecciona un género</option>
+      </select>
+
+      <input
+        type="text"
+        id="newGenreName"
+        placeholder="Nuevo género"
+        class="hidden"
+      />
+
+      <input type="text" id="actors" placeholder="Actores (Maria, Juan)" />
+      <input type="number" id="runtime" placeholder="Duración en minutos" required />
+      <input type="number" id="listPrice" placeholder="Precio" required />
+
+      <div class="form-actions">
+        <button type="submit">Guardar película</button>
+        <button type="button" class="secondary-button" onclick="closeMovieModal()">Cancelar</button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -4,27 +4,56 @@ const { connectDB } = require("../db");
 
 const router = express.Router();
 
+// Para encontrar los clientes y peliculas por nombre
+router.get("/options", async (req, res) => {
+  try {
+    const db = await connectDB();
+
+    const customers = await db.collection("customers")
+      .find({})
+      .project({
+        _id: 1,
+        firstName: 1,
+        lastName: 1,
+        email: 1
+      })
+      .sort({ firstName: 1 })
+      .toArray();
+
+    const movies = await db.collection("movies")
+      .find({})
+      .project({
+        _id: 1,
+        title: 1,
+        listPrice: 1,
+        genre: 1
+      })
+      .sort({ title: 1 })
+      .toArray();
+
+    res.json({ customers, movies });
+  } catch (error) {
+    res.status(500).json({
+      message: "Error al cargar opciones",
+      error: error.message
+    });
+  }
+});
+
+// Filtra por nombre del cliente o titulo de pelicula
 router.get("/", async (req, res) => {
   try {
     const db = await connectDB();
-    const { custId, movieId, paymentMethod } = req.query;
+    const { customerName, movieTitle, paymentMethod } = req.query;
 
-    const filter = {};
-
-    if (custId) {
-      filter.custId = Number(custId);
-    }
-
-    if (movieId) {
-      filter.movieId = Number(movieId);
-    }
+    const baseFilter = {};
 
     if (paymentMethod) {
-      filter.paymentMethod = { $regex: paymentMethod, $options: "i" };
+      baseFilter.paymentMethod = { $regex: paymentMethod, $options: "i" };
     }
 
-    const sales = await db.collection("custsales").aggregate([
-      { $match: filter },
+    const pipeline = [
+      { $match: baseFilter },
       {
         $lookup: {
           from: "customers",
@@ -53,19 +82,62 @@ router.get("/", async (req, res) => {
           preserveNullAndEmptyArrays: true
         }
       }
-    ]).toArray();
+    ];
+
+    const relatedFilter = {};
+
+    if (customerName) {
+      relatedFilter.$or = [
+        { "customer.firstName": { $regex: customerName, $options: "i" } },
+        { "customer.lastName": { $regex: customerName, $options: "i" } }
+      ];
+    }
+
+    if (movieTitle) {
+      relatedFilter["movie.title"] = { $regex: movieTitle, $options: "i" };
+    }
+
+    if (Object.keys(relatedFilter).length > 0) {
+      pipeline.push({ $match: relatedFilter });
+    }
+
+    const sales = await db.collection("custsales").aggregate(pipeline).toArray();
 
     res.json(sales);
   } catch (error) {
-    res.status(500).json({ message: "Error al listar ventas", error: error.message });
+    res.status(500).json({
+      message: "Error al listar ventas",
+      error: error.message
+    });
   }
 });
+
+// Formato de ID de sales
+async function getNextSaleId(db) {
+  const lastSale = await db.collection("custsales")
+    .find({ _id: { $regex: /^sale\d+$/ } })
+    .sort({ _id: -1 })
+    .limit(1)
+    .toArray();
+
+  if (lastSale.length === 0) {
+    return "sale001";
+  }
+
+  const lastId = lastSale[0]._id;
+  const lastNumber = Number(lastId.replace("sale", ""));
+  const nextNumber = lastNumber + 1;
+
+  return `sale${String(nextNumber).padStart(3, "0")}`;
+}
 
 router.post("/", async (req, res) => {
   try {
     const db = await connectDB();
+    const nextSaleId = await getNextSaleId(db);
 
     const sale = {
+      _id: nextSaleId,
       dayId: req.body.dayId,
       custId: Number(req.body.custId),
       movieId: Number(req.body.movieId),
