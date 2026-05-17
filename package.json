@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "mongodb": "^7.2.0"
+  },
+
+  "scripts": {
+    "seed": "node seed.js"
+  }
+}
