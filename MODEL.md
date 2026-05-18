@@ -1,5 +1,3 @@
-**Propuesta de modelo NoSQL en MongoDB para MovieStream** 
-
 # Propuesta de modelo NoSQL en MongoDB para MovieStream
 
 El modelo propuesto para MovieStream NoSQL se conforma de colecciones, documentos, referencias y datos embebidos. Aunque el modelo SQL original contiene más tablas, inicialmente se tomaron como base las tablas que se utilizaron con mayor frecuencia en actividades anteriores: **CUSTOMER**, **CUSTSALES**, **MOVIE**, **GENRE** y **ACTIVITY**, ya que concentran la información principal sobre clientes, ventas, películas, géneros y actividades de los usuarios dentro de la plataforma.
@@ -18,7 +16,9 @@ La relación entre **GENRE** y **MOVIE** fue la única que se decidió embeber d
 
 En resumen, el modelo NoSQL combina referencias y datos embebidos según la naturaleza de cada relación. Todo lo que describe directamente al cliente se embebe dentro de `customers`, mientras que los registros que pueden crecer con el tiempo, como ventas, actividades y feedbacks, se manejan como colecciones independientes con referencias. Esta estructura permite conservar una lógica similar al modelo relacional, pero adaptada a la flexibilidad y funcionamiento de MongoDB.
 
-**Colecciones finales**
+Para las colecciones de customer y movie se uso la funcion buildCustomer y buildMovie correspondientemente para tener datos preterminados y no tener que reescribir todos los datos dentro del seed.js cada vez que se hacia una dato nuevo.
+
+## **Colecciones finales**
 
 El modelo quedaría compuesto por 4 colecciones
 - customers
@@ -27,7 +27,7 @@ El modelo quedaría compuesto por 4 colecciones
 - activites
 - feedback
 
-__Colección customers__
+### __Colección customers__
 
 Guardará la información  del cliente
 Ejemplo: 
@@ -92,7 +92,7 @@ Ejemplo:
   }
 }
 
-__Colección feedback__
+### __Colección feedback__
 Almacenara los feedback del usuario de la app en general 
 {
   "_id": "feedback001",
@@ -110,7 +110,7 @@ Almacenara los feedback del usuario de la app en general
   "sentiment": "neutral"
 }
 
-__Colección movies__
+### __Colección movies__
 
 Almacenará la información de las películas
 {
@@ -140,7 +140,7 @@ Almacenará la información de las películas
   "createdAt": "2026-01-01"
 }
 
-__Colección custsales__
+### __Colección custsales__
 
 Almacena las ventas realizadas por cliente. Cuando la venta proviene de una actividad de tipo purchase, se embebe un pequeño objeto llamado activityContext, que guarda el contexto de la compra
 {
@@ -165,7 +165,7 @@ Almacena las ventas realizadas por cliente. Cuando la venta proviene de una acti
   }
 }
 
-__Colección activites__
+### __Colección activites__
 
 Almacena las actividades generales del usuario dentro de la plataforma, se mantiene como colección independiente porque puede contener muchas acciones que no necesariamente terminan en una venta, por ejemplo reproducciones, búsquedas, vistas, pausas o interacciones.
 {
@@ -179,7 +179,7 @@ Almacena las actividades generales del usuario dentro de la plataforma, se manti
   "os": "macos"
 }
 
-**Decisiones por relación**
+## **Decisiones por relación**
 
 -Se referencia desde custsales hacia customer
 -Se referencia desde custsales hacia movie
@@ -188,7 +188,7 @@ Almacena las actividades generales del usuario dentro de la plataforma, se manti
 -Se embebe activites en custsales cuando la actividad es purchase.
 -Se referencia customer dentro de feedback.
 
-**CONSULTAS** 
+## **CONSULTAS** 
 
 ¿Qué consultas se vuelven más fáciles? ¿Cuáles más difíciles?
 Las consultas que se hicieron más fáciles fueron las que tenían las tablas embebidas, como por ejemplo el genero de la pelicula o el segmento del cliente y las que se hicieron más dificiles fueron las de referencia como por ejemplo el nombre del cliente o el titulo de la pelicula en ventas, especialmente por el formato en que se hacen y que no es un simple JOIN como en SQL.

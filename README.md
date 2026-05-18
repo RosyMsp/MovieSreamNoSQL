@@ -54,10 +54,12 @@ movies
 custsales
 activities
 customerFeedback
+```
 
 ## Para mas información del modelo esta el archivo __MODEL.md__
 
 ## Para probar la base de datos esta el archivo __seed.js__
+
 
 
 ## Stack Tecnológico
