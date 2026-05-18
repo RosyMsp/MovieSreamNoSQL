@@ -4,7 +4,7 @@ const { connectDB } = require("../db");
 
 const router = express.Router();
 
-// Para encontrar los clientes y peliculas por nombre
+// Para que al momento de crear una venta, los datos se pongan automaticos
 router.get("/options", async (req, res) => {
   try {
     const db = await connectDB();
@@ -15,7 +15,8 @@ router.get("/options", async (req, res) => {
         _id: 1,
         firstName: 1,
         lastName: 1,
-        email: 1
+        email: 1,
+        contact: 1
       })
       .sort({ firstName: 1 })
       .toArray();

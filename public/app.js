@@ -1,19 +1,31 @@
 const MOVIES_API = "/api/movies";
 const SALES_API = "/api/custsales";
+const FEEDBACK_API = "/api/feedback";
 let currentMovies = [];
-let saleCustomers = [];
+let customers = [];
 let saleMovies = [];
+
 
 document.addEventListener("DOMContentLoaded", async () => {
   await loadComponent("movies-section", "components/movies.html");
   await loadComponent("custsales-section", "components/custsales.html");
+  await loadComponent("feedback-section", "components/feedback.html");
+
 
   document.getElementById("movieForm").addEventListener("submit", saveMovie);
   document.getElementById("saleForm").addEventListener("submit", saveSale);
+  document.getElementById("feedbackForm").addEventListener("submit", saveFeedback);
 
   loadMovies();
   loadSales();
+  loadFeedbacks();
 });
+
+function extractRuntimeNumber(runtime) {
+  if (!runtime) return "";
+
+  return String(runtime).replace("min", "").trim();
+}
 
 async function loadComponent(containerId, filePath) {
   const response = await fetch(filePath);
@@ -24,15 +36,19 @@ async function loadComponent(containerId, filePath) {
 function showPage(pageName) {
   const moviesPage = document.getElementById("movies-page");
   const salesPage = document.getElementById("sales-page");
+  const feedbackPage = document.getElementById("feedback-page");
 
   const moviesButton = document.getElementById("moviesNavButton");
   const salesButton = document.getElementById("salesNavButton");
+  const feedbackButton = document.getElementById("feedbackNavButton");
 
   moviesPage.classList.remove("active-page");
   salesPage.classList.remove("active-page");
+  feedbackPage.classList.remove("active-page");
 
   moviesButton.classList.remove("active");
   salesButton.classList.remove("active");
+  feedbackButton.classList.remove("active");
 
   if (pageName === "movies") {
     moviesPage.classList.add("active-page");
@@ -44,6 +60,12 @@ function showPage(pageName) {
     salesPage.classList.add("active-page");
     salesButton.classList.add("active");
     loadSales();
+  }
+
+  if (pageName === "feedback") {
+    feedbackPage.classList.add("active-page");
+    feedbackButton.classList.add("active");
+    loadFeedbacks();
   }
 }
 
@@ -72,11 +94,13 @@ async function loadMovies() {
 
       row.innerHTML = `
         <td>${movie._id}</td>
+        <td>${movie.sku || ""}</td>
         <td>${movie.title || ""}</td>
         <td>${movie.year || ""}</td>
         <td>${movie.genre?.name || ""}</td>
-        <td>${Array.isArray(movie.actors) ? movie.actors.join(", ") : ""}</td>
-        <td>${movie.runtime || ""} min</td>
+        <td>${movie.cast || ""}</td>
+        <td>${movie.studio || ""}</td>
+        <td>${movie.runtime || ""}</td>
         <td>$${movie.listPrice || 0}</td>
         <td class="actions">
           <button type="button" onclick='editMovie(${safeJson(movie)})'>Editar</button>
@@ -136,13 +160,14 @@ function loadGenreOptions() {
 
 function handleGenreChange() {
   const genreSelect = document.getElementById("genreSelect");
+  const newGenreField = document.getElementById("newGenreField");
   const newGenreName = document.getElementById("newGenreName");
 
   if (genreSelect.value === "other") {
-    newGenreName.classList.remove("hidden");
+    newGenreField.classList.remove("hidden");
     newGenreName.required = true;
   } else {
-    newGenreName.classList.add("hidden");
+    newGenreField.classList.add("hidden");
     newGenreName.required = false;
     newGenreName.value = "";
   }
@@ -195,9 +220,19 @@ async function saveMovie(event) {
     year: Number(document.getElementById("year").value),
     genreId: genreData.genreId,
     genreName: genreData.genreName,
-    actors: document.getElementById("actors").value.trim(),
+    cast: document.getElementById("cast").value.trim(),
+    crew: document.getElementById("crew").value.trim(),
+    studio: document.getElementById("studio").value.trim(),
     runtime: Number(document.getElementById("runtime").value),
-    listPrice: Number(document.getElementById("listPrice").value)
+    listPrice: Number(document.getElementById("listPrice").value),
+    gross: document.getElementById("gross").value.trim(),
+    views: Number(document.getElementById("views").value || 0),
+    awards: document.getElementById("awards").value.trim() || "None",
+    budget: document.getElementById("budget").value.trim(),
+    nominations: document.getElementById("nominations").value.trim() || "None",
+    mainSubject: document.getElementById("mainSubject").value.trim(),
+    openingDate: document.getElementById("openingDate").value,
+    summary: document.getElementById("summary").value.trim()
   };
 
   try {
@@ -241,40 +276,51 @@ function closeMovieModal() {
 }
 
 function editMovie(movie) {
-  showPage("movies");
+    showPage("movies");
 
-  document.getElementById("movieModalTitle").textContent = "Editar película";
-  document.getElementById("movieModal").classList.remove("hidden");
+    document.getElementById("movieModalTitle").textContent = "Editar película";
+    document.getElementById("movieModal").classList.remove("hidden");
 
-  document.getElementById("movieId").value = movie._id;
-  document.getElementById("title").value = movie.title || "";
-  document.getElementById("year").value = movie.year || "";
-  document.getElementById("actors").value = Array.isArray(movie.actors) ? movie.actors.join(", ") : "";
-  document.getElementById("runtime").value = movie.runtime || "";
-  document.getElementById("listPrice").value = movie.listPrice || "";
+    document.getElementById("movieId").value = movie._id;
+    document.getElementById("title").value = movie.title || "";
+    document.getElementById("year").value = movie.year || "";
+    document.getElementById("cast").value = movie.cast || "";
+    document.getElementById("crew").value = movie.crew || "";
+    document.getElementById("studio").value = movie.studio || "";
+    document.getElementById("runtime").value = extractRuntimeNumber(movie.runtime);
+    document.getElementById("listPrice").value = movie.listPrice || "";
+    document.getElementById("gross").value = movie.gross || "";
+    document.getElementById("views").value = movie.views || "";
+    document.getElementById("awards").value = movie.awards || "";
+    document.getElementById("budget").value = movie.budget || "";
+    document.getElementById("nominations").value = movie.nominations || "";
+    document.getElementById("mainSubject").value = movie.mainSubject || "";
+    document.getElementById("openingDate").value = movie.openingDate || "";
+    document.getElementById("summary").value = movie.summary || "";
 
-  loadGenreOptions();
+    loadGenreOptions();
 
-  const genreSelect = document.getElementById("genreSelect");
-  const newGenreName = document.getElementById("newGenreName");
+    const genreSelect = document.getElementById("genreSelect");
+    const newGenreField = document.getElementById("newGenreField");
+    const newGenreName = document.getElementById("newGenreName");
 
-  const genreId = movie.genre?.genreId;
+    const genreId = movie.genre?.genreId;
 
-  const existsInSelect = Array.from(genreSelect.options).some(
+    const existsInSelect = Array.from(genreSelect.options).some(
     option => option.value === String(genreId)
-  );
+    );
 
-  if (existsInSelect) {
+    if (existsInSelect) {
     genreSelect.value = String(genreId);
-    newGenreName.classList.add("hidden");
+    newGenreField.classList.add("hidden");
     newGenreName.required = false;
     newGenreName.value = "";
-  } else {
+    } else {
     genreSelect.value = "other";
-    newGenreName.classList.remove("hidden");
+    newGenreField.classList.remove("hidden");
     newGenreName.required = true;
     newGenreName.value = movie.genre?.name || "";
-  }
+    }
 }
 
 async function deleteMovie(id) {
@@ -306,8 +352,10 @@ function resetMovieForm() {
   document.getElementById("movieForm").reset();
   document.getElementById("movieId").value = "";
 
+  const newGenreField = document.getElementById("newGenreField");
   const newGenreName = document.getElementById("newGenreName");
-  newGenreName.classList.add("hidden");
+
+  newGenreField.classList.add("hidden");
   newGenreName.required = false;
   newGenreName.value = "";
 }
@@ -379,7 +427,7 @@ async function loadSaleOptions() {
     const response = await fetch(`${SALES_API}/options`);
     const data = await response.json();
 
-    saleCustomers = data.customers || [];
+    customers = data.customers || [];
     saleMovies = data.movies || [];
 
     fillCustomerSelect();
@@ -397,7 +445,7 @@ function fillCustomerSelect() {
 
   select.innerHTML = `<option value="">Selecciona un cliente</option>`;
 
-  saleCustomers.forEach((customer) => {
+  customers.forEach((customer) => {
     const option = document.createElement("option");
 
     option.value = customer._id;
@@ -570,6 +618,225 @@ function clearSaleFilters() {
   document.getElementById("filterMovieTitle").value = "";
   document.getElementById("filterPaymentMethod").value = "";
   loadSales();
+}
+
+// FEEDBACK
+async function loadFeedbacks() {
+  try {
+    const customerName = document.getElementById("filterFeedbackCustomer").value.trim();
+    const sentiment = document.getElementById("filterFeedbackSentiment").value.trim();
+    const city = document.getElementById("filterFeedbackCity").value.trim();
+
+    const params = new URLSearchParams();
+
+    if (customerName) params.append("customerName", customerName);
+    if (sentiment) params.append("sentiment", sentiment);
+    if (city) params.append("city", city);
+
+    const response = await fetch(`${FEEDBACK_API}?${params.toString()}`);
+    const feedbacks = await response.json();
+
+    const tableBody = document.getElementById("feedbackTableBody");
+    tableBody.innerHTML = "";
+
+    feedbacks.forEach((feedback) => {
+      const customerName = feedback.customer
+        ? `${feedback.customer.firstName || ""} ${feedback.customer.lastName || ""}`.trim()
+        : `Cliente ${feedback.custId}`;
+
+      const row = document.createElement("tr");
+
+      row.innerHTML = `
+        <td>${feedback._id}</td>
+        <td>${customerName}</td>
+        <td>${feedback.day || ""}</td>
+        <td>${feedback.email || ""}</td>
+        <td>${feedback.location?.city || ""}</td>
+        <td>${feedback.customerComments || ""}</td>
+        <td>${feedback.sentiment || ""}</td>
+        <td class="actions">
+          <button type="button" onclick='editFeedback(${safeJson(feedback)})'>Editar</button>
+          <button type="button" class="danger-button" onclick='deleteFeedback("${feedback._id}")'>Eliminar</button>
+        </td>
+      `;
+
+      tableBody.appendChild(row);
+    });
+  } catch (error) {
+    alert("Error al cargar feedbacks");
+    console.error(error);
+  }
+}
+
+async function loadFeedbackOptions() {
+  try {
+    if (customers.length === 0) {
+      const response = await fetch(`${FEEDBACK_API}/options`);
+      const data = await response.json();
+      customers = data.customers || [];
+    }
+
+    fillFeedbackCustomerSelect();
+  } catch (error) {
+    alert("Error al cargar clientes para feedback");
+    console.error(error);
+  }
+}
+
+function fillFeedbackCustomerSelect() {
+  const select = document.getElementById("feedbackCustomerSelect");
+
+  if (!select) return;
+
+  select.innerHTML = `<option value="">Selecciona un cliente</option>`;
+
+  customers.forEach((customer) => {
+    const option = document.createElement("option");
+
+    option.value = customer._id;
+    option.textContent = `${customer.firstName || ""} ${customer.lastName || ""}`.trim();
+    option.dataset.email = customer.email || "";
+    option.dataset.city = customer.contact?.city || "";
+    option.dataset.stateProvince = customer.contact?.stateProvince || "";
+    option.dataset.country = customer.contact?.country || "";
+    option.dataset.continent = customer.contact?.continent || "";
+
+    select.appendChild(option);
+  });
+}
+
+function handleFeedbackCustomerChange() {
+  const select = document.getElementById("feedbackCustomerSelect");
+  const selectedOption = select.options[select.selectedIndex];
+
+  if (!selectedOption) return;
+
+  const custId = select.value;
+
+  document.getElementById("feedbackUserId").value = custId
+    ? `USR${String(custId).padStart(3, "0")}`
+    : "";
+
+  document.getElementById("feedbackEmail").value = selectedOption.dataset.email || "";
+  document.getElementById("feedbackCity").value = selectedOption.dataset.city || "";
+  document.getElementById("feedbackStateProvince").value = selectedOption.dataset.stateProvince || "";
+  document.getElementById("feedbackCountry").value = selectedOption.dataset.country || "";
+  document.getElementById("feedbackContinent").value = selectedOption.dataset.continent || "";
+}
+
+async function openFeedbackModal() {
+  resetFeedbackForm();
+  await loadFeedbackOptions();
+
+  document.getElementById("feedbackModalTitle").textContent = "Nuevo feedback";
+  document.getElementById("feedbackModal").classList.remove("hidden");
+}
+
+function closeFeedbackModal() {
+  document.getElementById("feedbackModal").classList.add("hidden");
+  resetFeedbackForm();
+}
+
+async function saveFeedback(event) {
+  event.preventDefault();
+
+  const feedbackId = document.getElementById("feedbackId").value;
+
+  const feedbackData = {
+    custId: Number(document.getElementById("feedbackCustomerSelect").value),
+    day: document.getElementById("feedbackDay").value,
+    userId: document.getElementById("feedbackUserId").value.trim(),
+    email: document.getElementById("feedbackEmail").value.trim(),
+    city: document.getElementById("feedbackCity").value.trim(),
+    stateProvince: document.getElementById("feedbackStateProvince").value.trim(),
+    country: document.getElementById("feedbackCountry").value.trim(),
+    continent: document.getElementById("feedbackContinent").value.trim(),
+    customerComments: document.getElementById("feedbackComments").value.trim(),
+    sentiment: document.getElementById("feedbackSentiment").value
+  };
+
+  try {
+    const url = feedbackId ? `${FEEDBACK_API}/${feedbackId}` : FEEDBACK_API;
+    const method = feedbackId ? "PUT" : "POST";
+
+    const response = await fetch(url, {
+      method,
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(feedbackData)
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      alert(data.message || "No se pudo guardar el feedback");
+      return;
+    }
+
+    closeFeedbackModal();
+    loadFeedbacks();
+  } catch (error) {
+    alert("Error al guardar feedback");
+    console.error(error);
+  }
+}
+
+async function editFeedback(feedback) {
+  showPage("feedback");
+
+  document.getElementById("feedbackModalTitle").textContent = "Editar feedback";
+  document.getElementById("feedbackModal").classList.remove("hidden");
+
+  await loadFeedbackOptions();
+
+  document.getElementById("feedbackId").value = feedback._id;
+  document.getElementById("feedbackCustomerSelect").value = feedback.custId || "";
+  document.getElementById("feedbackDay").value = feedback.day || "";
+  document.getElementById("feedbackUserId").value = feedback.userId || "";
+  document.getElementById("feedbackEmail").value = feedback.email || "";
+  document.getElementById("feedbackCity").value = feedback.location?.city || "";
+  document.getElementById("feedbackStateProvince").value = feedback.location?.stateProvince || "";
+  document.getElementById("feedbackCountry").value = feedback.location?.country || "";
+  document.getElementById("feedbackContinent").value = feedback.location?.continent || "";
+  document.getElementById("feedbackComments").value = feedback.customerComments || "";
+  document.getElementById("feedbackSentiment").value = feedback.sentiment || "";
+}
+
+async function deleteFeedback(id) {
+  const confirmDelete = confirm("¿Seguro que quieres eliminar este feedback?");
+
+  if (!confirmDelete) return;
+
+  try {
+    const response = await fetch(`${FEEDBACK_API}/${id}`, {
+      method: "DELETE"
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      alert(data.message || "No se pudo eliminar el feedback");
+      return;
+    }
+
+    loadFeedbacks();
+  } catch (error) {
+    alert("Error al eliminar feedback");
+    console.error(error);
+  }
+}
+
+function resetFeedbackForm() {
+  document.getElementById("feedbackForm").reset();
+  document.getElementById("feedbackId").value = "";
+}
+
+function clearFeedbackFilters() {
+  document.getElementById("filterFeedbackCustomer").value = "";
+  document.getElementById("filterFeedbackSentiment").value = "";
+  document.getElementById("filterFeedbackCity").value = "";
+  loadFeedbacks();
 }
 
 function safeJson(data) {

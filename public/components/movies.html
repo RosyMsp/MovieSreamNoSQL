@@ -22,10 +22,12 @@
       <thead>
         <tr>
           <th>ID</th>
+          <th>SKU</th>
           <th>Título</th>
           <th>Año</th>
           <th>Género</th>
-          <th>Actores</th>
+          <th>Reparto</th>
+          <th>Estudio</th>
           <th>Duración</th>
           <th>Precio</th>
           <th>Acciones</th>
@@ -44,30 +46,99 @@
     </div>
 
     <form id="movieForm" class="form modal-form">
-      <input type="hidden" id="movieId" />
+    <input type="hidden" id="movieId" />
 
-      <input type="text" id="title" placeholder="Título" required />
-      <input type="number" id="year" placeholder="Año" required />
+    <label class="field">
+        <span>Título</span>
+        <input type="text" id="title" placeholder="Ej. Ciudad Neón" required />
+    </label>
 
-      <select id="genreSelect" required onchange="handleGenreChange()">
+    <label class="field">
+        <span>Año</span>
+        <input type="number" id="year" placeholder="Ej. 2021" required />
+    </label>
+
+    <label class="field">
+        <span>Género</span>
+        <select id="genreSelect" required onchange="handleGenreChange()">
         <option value="">Selecciona un género</option>
-      </select>
+        </select>
+    </label>
 
-      <input
-        type="text"
-        id="newGenreName"
-        placeholder="Nuevo género"
-        class="hidden"
-      />
+    <label class="field hidden" id="newGenreField">
+        <span>Nuevo género</span>
+        <input type="text" id="newGenreName" placeholder="Ej. Romance" />
+    </label>
 
-      <input type="text" id="actors" placeholder="Actores (Maria, Juan)" />
-      <input type="number" id="runtime" placeholder="Duración en minutos" required />
-      <input type="number" id="listPrice" placeholder="Precio" required />
+    <label class="field">
+        <span>Reparto</span>
+        <input type="text" id="cast" placeholder="Ej. Santiago Mora, Elena Cruz" required />
+    </label>
 
-      <div class="form-actions">
+    <label class="field">
+        <span>Equipo / director</span>
+        <input type="text" id="crew" placeholder="Ej. Director: Raúl Ibarra" required />
+    </label>
+
+    <label class="field">
+        <span>Estudio</span>
+        <input type="text" id="studio" placeholder="Ej. Luma Studios" required />
+    </label>
+
+    <label class="field">
+        <span>Duración en minutos</span>
+        <input type="number" id="runtime" placeholder="Ej. 115" required />
+    </label>
+
+    <label class="field">
+        <span>Precio</span>
+        <input type="number" id="listPrice" placeholder="Ej. 149" required />
+    </label>
+
+    <label class="field">
+        <span>Gross / ingresos</span>
+        <input type="text" id="gross" placeholder="Ej. 1125000" />
+    </label>
+
+    <label class="field">
+        <span>Vistas</span>
+        <input type="number" id="views" placeholder="Ej. 31250" />
+    </label>
+
+    <label class="field">
+        <span>Premios</span>
+        <input type="text" id="awards" placeholder="Ej. None" />
+    </label>
+
+    <label class="field">
+        <span>Presupuesto</span>
+        <input type="text" id="budget" placeholder="Ej. 450000" />
+    </label>
+
+    <label class="field">
+        <span>Nominaciones</span>
+        <input type="text" id="nominations" placeholder="Ej. None" />
+    </label>
+
+    <label class="field">
+        <span>Tema principal</span>
+        <input type="text" id="mainSubject" placeholder="Ej. Urban chase" required />
+    </label>
+
+    <label class="field">
+        <span>Fecha de estreno</span>
+        <input type="date" id="openingDate" required />
+    </label>
+
+    <label class="field field-full">
+        <span>Resumen</span>
+        <textarea id="summary" placeholder="Escribe el resumen de la película"></textarea>
+    </label>
+
+    <div class="form-actions">
         <button type="submit">Guardar película</button>
         <button type="button" class="secondary-button" onclick="closeMovieModal()">Cancelar</button>
-      </div>
+    </div>
     </form>
   </div>
 </div>

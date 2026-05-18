@@ -1,0 +1,113 @@
+<section class="section">
+  <div class="section-header">
+    <div>
+      <h2>Feedback</h2>
+      <p>En esta colección se guardan comentarios de clientes y se referencia al cliente mediante custId.</p>
+    </div>
+
+    <button type="button" onclick="openFeedbackModal()">
+      Nuevo feedback
+    </button>
+  </div>
+
+  <div class="filters">
+    <input type="text" id="filterFeedbackCustomer" placeholder="Buscar por cliente" />
+    <input type="text" id="filterFeedbackSentiment" placeholder="Filtrar por sentimiento" />
+    <input type="text" id="filterFeedbackCity" placeholder="Filtrar por ciudad" />
+    <button type="button" onclick="loadFeedbacks()">Buscar</button>
+    <button type="button" class="secondary-button" onclick="clearFeedbackFilters()">Limpiar</button>
+  </div>
+
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>ID feedback</th>
+          <th>Cliente</th>
+          <th>Fecha</th>
+          <th>Email</th>
+          <th>Ciudad</th>
+          <th>Comentario</th>
+          <th>Sentimiento</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="feedbackTableBody"></tbody>
+    </table>
+  </div>
+</section>
+
+<div id="feedbackModal" class="modal-overlay hidden">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="feedbackModalTitle">Nuevo feedback</h2>
+      <button type="button" class="close-button" onclick="closeFeedbackModal()">×</button>
+    </div>
+
+    <form id="feedbackForm" class="form modal-form">
+      <input type="hidden" id="feedbackId" />
+
+      <label class="field">
+        <span>Cliente</span>
+        <select id="feedbackCustomerSelect" required onchange="handleFeedbackCustomerChange()">
+          <option value="">Selecciona un cliente</option>
+        </select>
+      </label>
+
+      <label class="field">
+        <span>Fecha</span>
+        <input type="date" id="feedbackDay" required />
+      </label>
+
+      <label class="field">
+        <span>User ID</span>
+        <input type="text" id="feedbackUserId" placeholder="Ej. USR014" />
+      </label>
+
+      <label class="field">
+        <span>Email</span>
+        <input type="email" id="feedbackEmail" placeholder="cliente@email.com" />
+      </label>
+
+      <label class="field">
+        <span>Ciudad</span>
+        <input type="text" id="feedbackCity" placeholder="Ej. Monterrey" />
+      </label>
+
+      <label class="field">
+        <span>Estado o provincia</span>
+        <input type="text" id="feedbackStateProvince" placeholder="Ej. Nuevo León" />
+      </label>
+
+      <label class="field">
+        <span>País</span>
+        <input type="text" id="feedbackCountry" placeholder="Ej. México" />
+      </label>
+
+      <label class="field">
+        <span>Continente</span>
+        <input type="text" id="feedbackContinent" placeholder="Ej. América" />
+      </label>
+
+      <label class="field">
+        <span>Sentimiento</span>
+        <select id="feedbackSentiment" required>
+          <option value="">Selecciona una opción</option>
+          <option value="positive">positive</option>
+          <option value="neutral">neutral</option>
+          <option value="negative">negative</option>
+        </select>
+      </label>
+
+      <label class="field field-full">
+        <span>Comentario del cliente</span>
+        <textarea id="feedbackComments" placeholder="Escribe el comentario del cliente" required></textarea>
+      </label>
+
+      <div class="form-actions">
+        <button type="submit">Guardar feedback</button>
+        <button type="button" class="secondary-button" onclick="closeFeedbackModal()">Cancelar</button>
+      </div>
+    </form>
+  </div>
+</div>

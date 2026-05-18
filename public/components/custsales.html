@@ -46,33 +46,77 @@
       <button type="button" class="close-button" onclick="closeSaleModal()">×</button>
     </div>
 
-    <form id="saleForm" class="form modal-form">
-      <input type="hidden" id="saleId" />
+        <form id="saleForm" class="form modal-form">
+        <input type="hidden" id="saleId" />
 
-      <input type="date" id="dayId" required />
+        <label class="field">
+            <span>Fecha de venta</span>
+            <input type="date" id="dayId" required />
+        </label>
 
-      <select id="saleCustomerSelect" required>
-        <option value="">Selecciona un cliente</option>
-      </select>
+        <label class="field">
+            <span>Cliente</span>
+            <select id="saleCustomerSelect" required>
+            <option value="">Selecciona un cliente</option>
+            </select>
+        </label>
 
-      <select id="saleMovieSelect" required onchange="handleMoviePriceChange()">
-        <option value="">Selecciona una película</option>
-      </select>
+        <label class="field">
+            <span>Película</span>
+            <select id="saleMovieSelect" required onchange="handleMoviePriceChange()">
+            <option value="">Selecciona una película</option>
+            </select>
+        </label>
 
-      <input type="text" id="saleApp" placeholder="App" required />
-      <input type="text" id="saleDevice" placeholder="Dispositivo" required />
-      <input type="text" id="saleOs" placeholder="Sistema operativo" required />
-      <input type="text" id="paymentMethod" placeholder="Método de pago" required />
-      <input type="number" id="saleListPrice" placeholder="Precio lista" required />
-      <input type="text" id="discountType" placeholder="Tipo de descuento" required />
-      <input type="number" id="discountPercent" placeholder="Porcentaje descuento" required oninput="calculateActualPrice()" />
-      <input type="number" id="actualPrice" placeholder="Precio final" required />
-      <input type="datetime-local" id="activityTime" required />
+        <label class="field">
+            <span>App</span>
+            <input type="text" id="saleApp" placeholder="Ej. chrome" required />
+        </label>
 
-      <div class="form-actions">
-        <button type="submit">Guardar venta</button>
-        <button type="button" class="secondary-button" onclick="closeSaleModal()">Cancelar</button>
-      </div>
-    </form>
+        <label class="field">
+            <span>Dispositivo</span>
+            <input type="text" id="saleDevice" placeholder="Ej. iphone" required />
+        </label>
+
+        <label class="field">
+            <span>Sistema operativo</span>
+            <input type="text" id="saleOs" placeholder="Ej. ios" required />
+        </label>
+
+        <label class="field">
+            <span>Método de pago</span>
+            <input type="text" id="paymentMethod" placeholder="Ej. credit card" required />
+        </label>
+
+        <label class="field">
+            <span>Precio lista</span>
+            <input type="number" id="saleListPrice" placeholder="Ej. 149" required />
+        </label>
+
+        <label class="field">
+            <span>Tipo de descuento</span>
+            <input type="text" id="discountType" placeholder="Ej. promotion, none, student" required />
+        </label>
+
+        <label class="field">
+            <span>Porcentaje de descuento</span>
+            <input type="number" id="discountPercent" placeholder="Ej. 10" required oninput="calculateActualPrice()" />
+        </label>
+
+        <label class="field">
+            <span>Precio final</span>
+            <input type="number" id="actualPrice" placeholder="Ej. 134.10" required />
+        </label>
+
+        <label class="field">
+            <span>Fecha y hora de actividad</span>
+            <input type="datetime-local" id="activityTime" required />
+        </label>
+
+        <div class="form-actions">
+            <button type="submit">Guardar venta</button>
+            <button type="button" class="secondary-button" onclick="closeSaleModal()">Cancelar</button>
+        </div>
+        </form>
   </div>
 </div>
